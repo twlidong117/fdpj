@@ -16,6 +16,11 @@ ALTER SCHEMA public OWNER TO postgres;
 
 -- domain
 
+create domain public.pwd as text
+	constraint pwd_check check (length(value) >= 8 and length(value) <= 20);
+
+ALTER DOMAIN public.pwd OWNER TO postgres;
+
 -- 枚举
 
 CREATE TYPE public.gender AS ENUM (
@@ -27,7 +32,7 @@ ALTER TYPE public.gender OWNER TO postgres;
 
 CREATE TYPE public.prod_state AS ENUM (
   'on',
-  'ready'
+  'ready',
   'off'
 );
 
@@ -35,7 +40,7 @@ ALTER TYPE public.prod_state OWNER TO postgres;
 
 CREATE TYPE public.order_status AS ENUM (
   'toconfirm',
-  'confirmed'
+  'confirmed',
   'cancelled',
   'error'
 );
@@ -51,7 +56,7 @@ ALTER TYPE public.pay_status OWNER TO postgres;
 
 CREATE TYPE public.shipping_status AS ENUM (
   'tosend',
-  'sending'
+  'sending',
   'received'
 );
 
@@ -81,7 +86,8 @@ CREATE TABLE public.employee (
   name text NOT NULL,
   birth_date date NOT NULL,
   gender public.gender NOT NULL,
-  phone integer NOT NULL,
+  phone text NOT NULL ,
+  password public.pwd NOT NULL,
   del_flag boolean DEFAULT false NOT NULL,
   create_date date DEFAULT CURRENT_DATE NOT NULL,
   last_update_time timestamp with time zone DEFAULT now()
@@ -208,8 +214,9 @@ ALTER TABLE public.dish OWNER TO postgres;
 -- 菜品套餐关系表 dish_meal
 
 CREATE TABLE public.dish_meal (
-  dish_id integer NOT NULL,
   meal_id integer NOT NULL,
+  dish_id integer NOT NULL,
+  dish_num integer NOT NULL,
   del_flag boolean DEFAULT false NOT NULL,
   create_date date DEFAULT CURRENT_DATE NOT NULL,
   last_update_time timestamp with time zone DEFAULT now()
@@ -335,7 +342,8 @@ ALTER TABLE public.customer_customer_id_seq OWNER TO postgres;
 CREATE TABLE public.customer (
   customer_id integer DEFAULT nextval('public.customer_customer_id_seq'::regclass) NOT NULL,
   name text NOT NULL,
-  phone integer NOT NULL,
+  phone text NOT NULL,
+  password public.pwd NOT NULL,
   credit money NOT NULL,
   del_flag boolean DEFAULT false NOT NULL,
   create_date date DEFAULT CURRENT_DATE NOT NULL,
